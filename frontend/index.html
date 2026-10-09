@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Генератор управляющих программ для ЧПУ (GRBL)</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="logo" href="index.html">CNC<span>Gen</span></a>
+    <nav class="nav">
+      <a href="index.html" class="active">Генератор</a>
+      <a href="cabinet.html">Личный кабинет</a>
+      <span class="auth" id="authBox"></span>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Генератор управляющих программ</h1>
+  <p class="lead">
+    Формирование G-кода для фрезерного станка с контроллером <b>GRBL</b>.
+    Выберите геометрию, задайте параметры — программа рассчитает траекторию
+    и выдаст готовый файл <code>.txt</code>.
+  </p>
+
+  <div class="grid">
+
+    <!-- ================= ПАРАМЕТРЫ ================= -->
+    <section class="card">
+      <h2>Шаг 1. Геометрия обработки</h2>
+
+      <div class="geo" id="geoPicker">
+        <label class="geo-item">
+          <input type="radio" name="geometry" value="plane" checked>
+          <span class="geo-t">Плоскость</span>
+          <span class="geo-s">снятие слоя зигзагом</span>
+        </label>
+        <label class="geo-item">
+          <input type="radio" name="geometry" value="hole">
+          <span class="geo-t">Круглое отверстие</span>
+          <span class="geo-s">винтовая интерполяция</span>
+        </label>
+        <label class="geo-item">
+          <input type="radio" name="geometry" value="thread">
+          <span class="geo-t">Резьба</span>
+          <span class="geo-s">резьбовой фрезой</span>
+        </label>
+      </div>
+
+      <h2>Шаг 2. Геометрические параметры</h2>
+
+      <!-- --- плоскость --- -->
+      <div class="fields" data-geom="plane">
+        <div class="row">
+          <label>Длина заготовки X, мм
+            <input type="number" id="pLength" value="100" min="1" step="0.1">
+          </label>
+          <label>Ширина заготовки Y, мм
+            <input type="number" id="pWidth" value="60" min="1" step="0.1">
+          </label>
+        </div>
+        <div class="row">
+          <label>Глубина снятия, мм
+            <input type="number" id="pDepth" value="3" min="0.1" step="0.1">
+          </label>
+          <label>Перекрытие строчек, %
+            <input type="number" id="pStepover" value="70" min="10" max="95" step="5">
+          </label>
+        </div>
+        <div class="row">
+          <label>Начало координат
+            <select id="pOrigin">
+              <option value="corner">левый нижний угол заготовки</option>
+              <option value="center">центр заготовки</option>
+            </select>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="pZigzag" checked>
+            зигзаг (попутно/встречно)
+          </label>
+        </div>
+      </div>
+
+      <!-- --- отверстие --- -->
+      <div class="fields hidden" data-geom="hole">
+        <div class="row">
+          <label>Диаметр отверстия, мм
+            <input type="number" id="hDiameter" value="30" min="1" step="0.1">
+          </label>
+          <label>Глубина отверстия, мм
+            <input type="number" id="hDepth" value="10" min="0.1" step="0.1">
+          </label>
+        </div>
+        <p class="note">Ось отверстия совпадает с началом координат: X0 Y0 —
+          центр отверстия, Z0 — верх заготовки.</p>
+      </div>
+
+      <!-- --- резьба --- -->
+      <div class="fields hidden" data-geom="thread">
+        <div class="row">
+          <label>Диаметр резьбы, мм
+            <input type="number" id="tDiameter" value="20" min="1" step="0.1">
+          </label>
+          <label>Шаг резьбы, мм
+            <input type="number" id="tPitch" value="1.5" min="0.2" step="0.1">
+          </label>
+        </div>
+        <div class="row">
+          <label>Высота резьбы, мм
+            <input type="number" id="tDepth" value="12" min="0.1" step="0.1">
+          </label>
+          <label>Вид резьбы
+            <select id="tKind">
+              <option value="internal">внутренняя (в отверстии)</option>
+              <option value="external">наружная (на валу)</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <label>Направление
+            <select id="tHand">
+              <option value="right">правая</option>
+              <option value="left">левая</option>
+            </select>
+          </label>
+        </div>
+        <p class="note">Резьбовая фреза — однопрофильная. Обработка за один
+          проход по винтовой линии с шагом в одну нитку.</p>
+      </div>
+
+      <h2>Шаг 3. Режимы фрезерования</h2>
+
+      <div class="row">
+        <label>Диаметр фрезы, мм
+          <input type="number" id="toolDiameter" value="6" min="0.5" step="0.1">
+        </label>
+        <label>Обороты шпинделя, об/мин
+          <input type="number" id="spindle" value="12000" min="1000" step="500">
+        </label>
+      </div>
+      <div class="row">
+        <label>Рабочая подача F, мм/мин
+          <input type="number" id="feed" value="400" min="10" step="10">
+        </label>
+        <label>Подача врезания, мм/мин
+          <input type="number" id="plungeFeed" value="150" min="10" step="10">
+        </label>
+      </div>
+      <div class="row">
+        <label id="rowStepdown">Заглубление за проход, мм
+          <input type="number" id="stepdown" value="1" min="0.1" step="0.1">
+        </label>
+        <label>Безопасная высота Z, мм
+          <input type="number" id="safeZ" value="5" min="0.5" step="0.5">
+        </label>
+      </div>
+
+      <div class="btns">
+        <button class="btn primary" id="btnGenerate">Сформировать G-код</button>
+        <button class="btn" id="btnReset">Сбросить</button>
+      </div>
+
+      <div class="msg" id="msg"></div>
+    </section>
+
+    <!-- ================= РЕЗУЛЬТАТ ================= -->
+    <section class="card">
+      <h2>Управляющая программа</h2>
+
+      <div class="out-head">
+        <span class="stat" id="codeStats">код не сформирован</span>
+        <span class="spacer"></span>
+        <button class="btn small" id="btnCopy" disabled>Копировать</button>
+        <button class="btn small" id="btnDownload" disabled>Скачать .txt</button>
+      </div>
+
+      <pre class="gcode" id="gcodeOut">— здесь появится G-код —</pre>
+
+      <div class="save-row hidden" id="saveRow">
+        <input type="text" id="progName" placeholder="Название программы">
+        <button class="btn small primary" id="btnSave">Сохранить в кабинет</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= ТРАЕКТОРИЯ ================= -->
+  <section class="card full">
+    <h2>Траектория фрезерования</h2>
+    <p class="note">Вид сверху. Ускоренные перемещения — пунктиром,
+      рабочие ходы — сплошной линией, цвет линии соответствует глубине Z.</p>
+    <div class="canvas-box">
+      <canvas id="toolpath" width="1080" height="440"></canvas>
+    </div>
+    <div class="legend" id="legend"></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">Курсовой проект · генератор УП для ЧПУ с постпроцессором GRBL</div>
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/gcode.js"></script>
+<script src="js/draw.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

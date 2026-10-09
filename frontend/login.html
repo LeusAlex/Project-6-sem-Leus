@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Вход — Генератор УП</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="logo" href="index.html">CNC<span>Gen</span></a>
+    <nav class="nav">
+      <a href="index.html">Генератор</a>
+      <a href="cabinet.html">Личный кабинет</a>
+      <span class="auth" id="authBox"></span>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap narrow">
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" data-tab="login" type="button">Вход</button>
+      <button class="tab" data-tab="reg" type="button">Регистрация</button>
+    </div>
+
+    <form id="loginForm" class="form">
+      <label>Логин
+        <input type="text" id="loginUser" autocomplete="username" required>
+      </label>
+      <label>Пароль
+        <input type="password" id="loginPass" autocomplete="current-password" required>
+      </label>
+      <button class="btn primary" type="submit">Войти</button>
+    </form>
+
+    <form id="regForm" class="form hidden">
+      <label>Логин
+        <input type="text" id="regUser" required>
+      </label>
+      <label>Пароль
+        <input type="password" id="regPass" required>
+      </label>
+      <label>Повтор пароля
+        <input type="password" id="regPass2" required>
+      </label>
+      <button class="btn primary" type="submit">Зарегистрироваться</button>
+    </form>
+
+    <div class="msg" id="msg"></div>
+    <p class="hint">Учебный проект: пароль хранится на сервере в виде md5-хеша,
+      данные — в JSON-файлах. Не используйте реальный пароль.</p>
+  </div>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Личный кабинет — Генератор УП</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="logo" href="index.html">CNC<span>Gen</span></a>
+    <nav class="nav">
+      <a href="index.html">Генератор</a>
+      <a href="cabinet.html" class="active">Личный кабинет</a>
+      <span class="auth" id="authBox"></span>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Личный кабинет</h1>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Пользователь</h2>
+      <p>Логин: <b id="userLogin">—</b></p>
+      <p class="muted">Сохранённых программ: <b id="userCount">0</b></p>
+      <p class="muted" id="userSince"></p>
+      <div class="btns">
+        <button class="btn" id="btnLogout">Выйти</button>
+        <a class="btn primary" href="index.html">Новая программа</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Сохранённые программы</h2>
+      <div class="prog-list" id="progList">
+        <p class="muted">Загрузка…</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="card full hidden" id="viewer">
+    <h2 id="viewTitle">Программа</h2>
+    <div class="prog-meta" id="viewMeta"></div>
+
+    <div class="out-head">
+      <span class="stat" id="viewStats"></span>
+      <span class="spacer"></span>
+      <button class="btn small" id="btnDownloadSaved">Скачать .txt</button>
+      <button class="btn small danger" id="btnDelete">Удалить</button>
+    </div>
+
+    <pre class="gcode" id="viewCode"></pre>
+
+    <h3>Траектория</h3>
+    <div class="canvas-box">
+      <canvas id="viewCanvas" width="1080" height="440"></canvas>
+    </div>
+    <div class="legend" id="viewLegend"></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">Курсовой проект · генератор УП для ЧПУ с постпроцессором GRBL</div>
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/gcode.js"></script>
+<script src="js/draw.js"></script>
+<script src="js/cabinet.js"></script>
+</body>
+</html>
